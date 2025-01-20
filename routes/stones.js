@@ -1,5 +1,4 @@
 import express from 'express';
-import {faker} from "@faker-js/faker";
 import Stone from "../models/Stone.js";
 
 const router = express.Router()
@@ -30,37 +29,20 @@ router.get('/', async (req , res) => {
 // CREATE
 router.post('/', async (req, res) => {
     try {
-        const {title, body, author} = req.body;
+        const {name, img_url, category, hardness, diaphaneity, description} = req.body;
         const stone = await Stone.create({
-            title: title,
-            body: body,
-            author: author,
+            name: name,
+            img_url: img_url,
+            category: category,
+            hardness: hardness,
+            diaphaneity: diaphaneity,
+            description: description,
         });
         
-        res.status(201).res.json(stone);
+        res.status(201).json(stone);
 
     } catch (error) {
         res.status(400).res.json({error: error.message});
-    }
-
-    res.json({success: true})
-});
-
-// CREATE -> FAKER
-router.post('/seed', async (req, res) => {
-    try {
-        const amount = req.body.amount;
-
-        for(let i = 0; i < amount; i++) {
-            await Stone.create({
-                title: faker.lorem.lines(1),
-                body: faker.lorem.lines(),
-                author: faker.person.fullName(),
-            });
-        }
-
-    } catch (error) {
-        res.json({error: error.message});
     }
 
     res.json({success: true})
