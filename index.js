@@ -11,13 +11,11 @@ app.use((req, res, next) => {
     next();
 });
 
-// Middleware voor JSON-gegevens
+// Middleware
 app.use(express.json());
-
-// Middleware voor www-urlencoded-gegevens
 app.use(express.urlencoded({extended: true}));
 
-mongoose.connect('mongodb://127.0.0.1:27017/prg6');
+mongoose.connect('mongodb://127.0.0.1:27017/prg6-stones');
 
 app.use('/stones', stones);
 

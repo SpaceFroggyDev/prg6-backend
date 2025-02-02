@@ -2,11 +2,9 @@ import mongoose from 'mongoose';
 
 const stoneSchema = new mongoose.Schema({
     name: {type: String, required: true},
-    img_url: {type: String, required: false},
-    category: {type: String, required: true},
-    hardness: {type: Number, required: false},
-    diaphaneity: {type: String, required: false},
+    type: {type: String, required: true},
     description: {type: String, required: true},
+
 }, {toJSON: {
         virtuals: true,
         versionKey: false,
