@@ -4,18 +4,27 @@ import stones from "./routes/stones.js";
 
 const app = express();
 
-app.use((req, res, next) => {
-    if (req.method !== 'OPTIONS' && req.headers.accept !== 'application/json') {
-        return res.status(406).json({error:"Only requests with 'Accept: application/json' are supported"})
-    }
-    next();
-});
+await mongoose.connect('mongodb://127.0.0.1:27017/prg6-stones');
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-mongoose.connect('mongodb://127.0.0.1:27017/prg6-stones');
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept')
+    next()
+})
+
+app.use((req, res, next) => {
+    const acceptHeader = req.headers['accept'];
+
+    if (acceptHeader.includes('application/json') || req.method === 'OPTIONS') {
+        next()
+    } else {
+        res.status(406).send('Illegal format');
+    }
+});
 
 app.use('/stones', stones);
 

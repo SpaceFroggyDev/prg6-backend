@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const stoneSchema = new mongoose.Schema({
     name: {type: String, required: true},
-    type: {type: String, required: true},
+    category: {type: String, required: true},
     description: {type: String, required: true},
 
 }, {toJSON: {

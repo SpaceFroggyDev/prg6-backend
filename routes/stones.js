@@ -1,7 +1,7 @@
 import express from 'express';
 import Stone from "../models/Stone.js";
 
-const router = express.Router()
+const router = express.Router();
 
 router.get('/', async (req , res) => {
     try {
@@ -26,38 +26,20 @@ router.get('/', async (req , res) => {
     }
 });
 
-// CREATE
-// router.post('/', async (req, res) => {
-//     try {
-//         const {name, type, description} = req.body;
-//         const stone = await Stone.create({
-//             name: name,
-//             type: type,
-//             description: description,
-//         });
-//         res.header('Access-Control-Allow-Origin', '*');
-//         res.header('Access-Control-Allow-Headers', '*');
-//         res.status(201).json(stone);
-//
-//     } catch (error) {
-//         res.status(400).res.json({error: error.message});
-//     }
-//
-//     res.json({success: true})
-// });
-
+// POST
 router.post('/', async (req, res) => {
     try {
-        await Stone.create({
-            name: req.body.name,
-            type: req.body.type,
-            description: req.body.description,
+        const {name, category, description} = req.body;
+        const stone = await Stone.create({
+            name: name,
+            category: category,
+            description: description,
         });
         res.header('Access-Control-Allow-Origin', '*');
         res.header('Access-Control-Allow-Headers', '*');
-        res.status(201).json({message: "Created :D"});
+        res.status(201).json(stone);
+
     } catch (error) {
-        console.log(error);
         res.status(400).json({error: error.message});
     }
 });
@@ -67,24 +49,30 @@ router.get('/:id', async (req , res) => {
     const stoneId = req.params.id;
 
     try {
-        const stones = await Stone.find({_id:stoneId})
-        res.json(stones);
+        const stone = await Stone.findOne({_id:stoneId})
+        if (!stone) {
+            return res.status(404).json({ message: "Stone does not exist!" });
+        }
+        res.json(stone);
     } catch (error) {
         res.json({error: error.message});
     }
 });
 
-// DELETE
+//DELETE
 router.delete('/:id', async (req, res) => {
     const stoneId = req.params.id;
 
     try {
-        const stones = await Stone.findByIdAndDelete({_id:stoneId})
-        res.status(410);
+        const stone = await Stone.findByIdAndDelete({_id: stoneId});
+        if (!stone) {
+            return res.status(404).json({ message: "Stone does not exist!" });
+        }
+        res.status(204).json({message: "Stone has been deleted"});
     } catch (error) {
-        res.json({error: error.message});
+        res.status(400).json({error: error.message});
     }
-})
+});
 
 // EDIT / PUT
 router.put('/:id', async (req, res) => {
@@ -93,14 +81,14 @@ router.put('/:id', async (req, res) => {
 
         res.header('Access-Control-Allow-Origin', '*');
         res.header('Access-Control-Allow-Headers', '*');
-        if (!req.body.name || !req.body.type || !req.body.description) {
+        if (!req.body.name || !req.body.category || !req.body.description) {
             return res.status(400).json({ message: "Required fields missing" });
         } else {
             await Stone.findByIdAndUpdate(
                 stone.id,
                 {
                     name: req.body.name,
-                    type: req.body.type,
+                    category: req.body.category,
                     description: req.body.description,
                 });
             await res.status(201).json({message: "Stone has been edited"});
@@ -111,31 +99,16 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// OPTIONS
-router.options('/:id', async (req, res) => {
-    try {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Headers', '*');
-        res.header('ALLOW', 'GET, PUT, PATCH, DELETE, OPTIONS');
-        res.header('Access-Control-Allow-Methods', '*');
-        res.status(204).send();
-    } catch (error) {
-        console.log(error);
-        res.json({error: error.message})
-    }
-});
+router.options('/', (req, res) => {
+    res.setHeader("Allow", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.status(204).send();
+})
 
-router.options('/', async (req, res) => {
-    try {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Headers', '*');
-        res.header('ALLOW', 'GET, POST, OPTIONS');
-        res.header('Access-Control-Allow-Methods', '*');
-        res.status(204).send();
-    } catch (error) {
-        console.log(error);
-        res.json({error: error.message})
-    }
+router.options('/:id', (req, res) => {
+    res.setHeader("Allow", "GET,PUT,DELETE,OPTIONS");
+    res.setHeader("Access-Control-Allow-Methods", "GET,PUT,DELETE,OPTIONS");
+    res.status(204).send();
 });
 
 export default router
