@@ -22,7 +22,7 @@ router.get('/', async (req , res) => {
         res.json(collection);
 
     } catch (error) {
-        res.json({error: error.message});
+        res.status(400).json({error: error.message});
     }
 });
 
@@ -55,7 +55,7 @@ router.get('/:id', async (req , res) => {
         }
         res.json(stone);
     } catch (error) {
-        res.json({error: error.message});
+        return res.status(404).json({ message: "Stone does not exist!" });
     }
 });
 
@@ -74,7 +74,7 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-// EDIT / PUT
+// PUT
 router.put('/:id', async (req, res) => {
     try {
         const stone = await Stone.findOne({_id: req.params.id})
@@ -104,11 +104,5 @@ router.options('/', (req, res) => {
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
     res.status(204).send();
 })
-
-router.options('/:id', (req, res) => {
-    res.setHeader("Allow", "GET,PUT,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Methods", "GET,PUT,DELETE,OPTIONS");
-    res.status(204).send();
-});
 
 export default router
